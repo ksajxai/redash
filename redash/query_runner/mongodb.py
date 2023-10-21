@@ -232,7 +232,9 @@ class MongoDB(BaseQueryRunner):
                 for d in db[collection_name].find().sort([("$natural", 1)]).limit(1):
                     documents_sample.append(d)
 
-                for d in db[collection_name].find().sort([("$natural", -1)]).limit(1):
+                # Use _id for compatibility with AWS DocumentDB https://github.com/getredash/redash/issues/5089
+                # Otherwise gives error: "{$natural: -1} is not supported on server"
+                for d in db[collection_name].find().sort("_id", -1).limit(1):
                     documents_sample.append(d)
         except Exception as ex:
             template = "An exception of type {0} occurred. Arguments:\n{1!r}"
